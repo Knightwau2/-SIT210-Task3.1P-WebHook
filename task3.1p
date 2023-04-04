@@ -1,16 +1,30 @@
-int led = D7;  // The on-board LED
+#include <Adafruit_DHT.h>
+
+// Define the DHT11 sensor pin
+#define DHTPIN D2
+
+// Initialize the DHT sensor
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  pinMode(led, OUTPUT);
+  // Start serial communication
+  Serial.begin(9600);
+
+  // Connect to the Particle Cloud
+  Particle.connect();
+
+  // Initialize the DHT sensor
+  dht.begin();
 }
 
 void loop() {
-  digitalWrite(led, HIGH);   // Turn ON the LED
+  // Wait for 3 seconds
+  delay(3000);
 
-  String temp = String(random(60, 80));
-  Particle.publish("temp", temp, PRIVATE);
-  delay(3000);               // Wait for 3 seconds
+  // Read temperature values from the DHT sensor
+  float temperature = dht.readTemperature();
 
-  digitalWrite(led, LOW);    // Turn OFF the LED
-  delay(3000);               // Wait for 3 seconds
+  // Publish the temperature values to the Particle Cloud
+  Particle.publish("temperature", String(temperature));
 }
